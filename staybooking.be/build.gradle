@@ -15,7 +15,7 @@ java {
 
 repositories {
 	// 优先从阿里云镜像源下载依赖，速度极快
-	maven { url 'https://maven.aliyun.com/repository/public/' }
+	//maven { url 'https://maven.aliyun.com/repository/public/' }
 	// 如果阿里云没有，再作为备用去中央仓库找
 	mavenCentral()
 }

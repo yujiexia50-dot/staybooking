@@ -1,6 +1,7 @@
 package com.laioffer.staybooking;
 
-
+import java.io.InputStream;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.storage.Storage;
@@ -77,8 +78,20 @@ public class AppConfig {
 
     @Bean
     public Storage storage() throws IOException {
-        Credentials credentials = ServiceAccountCredentials.fromStream(getClass().getClassLoader().getResourceAsStream("credentials.json"));
-        return StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+        // 尝试在资源目录中寻找凭证文件
+        InputStream stream = getClass().getClassLoader().getResourceAsStream("credentials.json");
+
+        if (stream == null) {
+            // 【云端模式】：找不到文件，说明在 Cloud Run 上运行。
+            // 直接使用谷歌云自带的 Application Default Credentials。
+            return StorageOptions.getDefaultInstance().getService();
+        } else {
+            // 【本地模式】：找到了文件，说明在本地电脑运行。使用文件进行认证。
+            return StorageOptions.newBuilder()
+                    .setCredentials(GoogleCredentials.fromStream(stream))
+                    .build()
+                    .getService();
+        }
     }
 
 
