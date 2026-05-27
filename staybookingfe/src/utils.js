@@ -1,4 +1,4 @@
-const domain = "https://staybooking-614092140035.us-west1.run.app";
+const domain = "https://staybooking-319620047281.us-west1.run.app";
 
 export const login = (credential) => {
   const loginUrl = `${domain}/auth/login`;
@@ -8,13 +8,20 @@ export const login = (credential) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(credential),
-  }).then((response) => {
-    if (response.status >= 300) {
-      throw Error("Fail to log in");
-    }
+  })
+    .then((response) => {
+      if (response.status >= 300) {
+        throw Error("Fail to log in");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      //把后端返回的 token 存到浏览器的本地存储中
+      localStorage.setItem("authToken", data.token);
 
-    return response.json();
-  });
+      // 可以选择把 data 抛出去，以防登录组件需要用到它
+      return data;
+    });
 };
 
 export const register = (credential) => {
